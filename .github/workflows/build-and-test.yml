@@ -34,7 +34,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{matrix.node-version}}
-          cache: 'npm'
       # Install Package Manager
       - name: Install pnpm
         run: npm i -g pnpm
