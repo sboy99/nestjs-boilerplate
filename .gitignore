@@ -3,6 +3,9 @@
 node_modules
 bin
 
+# Environment 
+.env*
+
 # Logs
 logs
 *.log
