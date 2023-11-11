@@ -1,0 +1,52 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+      - dev
+      - cycle-*
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    # runner
+    name: Build and Test
+    runs-on: ubuntu-latest
+    # timeout
+    timeout-minutes: 10
+    # starategy
+    strategy:
+      matrix:
+        node-version: ['18.x']
+
+    steps:
+      # Checkout Branch
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      # Setup node environment
+      - name: Setup node environment ${{matrix.node-version}}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+          cache: 'pnpm'
+      # Install Package Manager
+      - name: Install pnpm
+        run: npm i -g pnpm
+      # Install Dependencies
+      - name: Install Dependencies
+        run: pnpm install
+      # Increment Heap Size
+      - name: Increment Heap Size
+        run: export NODE_OPTIONS=--max_old_space_size=3072
+      # Build
+      - name: Build the application
+        run: pnpm build
+      # Test
+      - name: Test the application
+        run: pnpm test
