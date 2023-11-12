@@ -9,13 +9,58 @@ services:
     command: pnpm run start:dev
     container_name: app
     env_file:
-      - ./.env
+      - .env
     ports:
-      - '3000:30000'
+      - '3000:3000'
     volumes:
       - .:/usr/src/app
     networks:
       - app_net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Infrastructure
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    env_file:
+      - .env
+    healthcheck:
+      test: pg_isready -q -d ${POSTGRES_PASSWORD} -U ${POSTGRES_USER}
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - '5432:5432'
+    networks:
+      - app_net
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  # Utility
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - '8080:80'
+    networks:
+      - app_net
+    volumes:
+      - pg_admin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pg_data:
+    name: pg_data
+  pg_admin_data:
+    name: pg_admin_data
 
 networks:
   app_net:
