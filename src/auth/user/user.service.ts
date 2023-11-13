@@ -1,46 +1,23 @@
 import { User } from '@app/common/entities';
 import type { ICrudService } from '@app/common/interfaces';
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import type { TPaginatedResource, TQuery } from '@app/common/types';
+import { BadRequestException, Injectable } from '@nestjs/common';
 
 import type { LoginUserDto, RegisterUserDto } from '../dtos';
 import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService implements ICrudService<User> {
-  protected readonly logger = new Logger(UserService.name);
-
   constructor(private readonly userRepository: UserRepository) {}
+
+  list(query: TQuery<User>): Promise<TPaginatedResource<User>> {
+    throw new Error('Method not implemented.');
+  }
 
   async create(registerUserDto: RegisterUserDto): Promise<User> {
     const user = new User(registerUserDto);
     const cUser = await this.userRepository.create(user);
-
-    this.logger.log(`User created ${JSON.stringify(cUser)}`);
-
     return cUser;
-  }
-
-  async list(where?: Partial<User>): Promise<User[]> {
-    const users = await this.userRepository.list(
-      { ...where },
-      {
-        relations: {
-          tasks: true,
-        },
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
-          tasks: {
-            id: true,
-            taskName: true,
-            prority: true,
-          },
-        },
-      }
-    );
-
-    return users;
   }
 
   async read(loginUserDto: LoginUserDto): Promise<User> {

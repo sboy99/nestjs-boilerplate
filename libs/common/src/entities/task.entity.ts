@@ -10,9 +10,9 @@ export class Task extends AbstractEntity<Task> {
   taskName: string;
 
   @Column({ type: 'enum', enum: TaskPriority, default: TaskPriority.NA })
-  prority: TaskPriority;
+  priority?: TaskPriority;
 
   @ManyToOne(() => User, (u) => u.tasks)
   @JoinColumn()
-  createdBy: User;
+  createdBy: Partial<User>;
 }

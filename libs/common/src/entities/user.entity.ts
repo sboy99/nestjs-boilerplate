@@ -16,5 +16,5 @@ export class User extends AbstractEntity<User> {
   password: string;
 
   @OneToMany(() => Task, (t) => t.createdBy, { onDelete: 'SET NULL' })
-  tasks: Task[];
+  tasks: Array<Partial<Task>>;
 }

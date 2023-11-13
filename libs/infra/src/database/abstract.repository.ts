@@ -1,6 +1,8 @@
+import type { TPaginatedResource, TQuery } from '@app/common/types';
+import { getOrder, getWhere } from '@app/common/utils';
 import type { Logger } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common';
-import type { EntityManager, FindManyOptions, FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import type { EntityManager, FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 import type { AbstractEntity } from './abstract.entity';
@@ -9,8 +11,8 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   protected abstract readonly logger: Logger;
 
   constructor(
-    readonly entityRepository: Repository<T>,
-    readonly entityManager: EntityManager
+    protected readonly entityRepository: Repository<T>,
+    protected readonly entityManager: EntityManager
   ) {}
 
   async create(entity: T): Promise<T> {
@@ -41,14 +43,29 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
     return this.findOne(where);
   }
 
-  async list(where: FindManyOptions<T>['where'], options?: Omit<FindManyOptions<T>, 'where'>) {
-    return this.entityRepository.find({
+  async list(query: TQuery<T>): Promise<TPaginatedResource<T>> {
+    const where = getWhere(query?.filters);
+    const order = getOrder(query?.sorts);
+
+    const { limit, offset, page, size } = query.pagination;
+
+    const [entities, count] = await this.entityRepository.findAndCount({
       where: {
         ...where,
         isDeleted: false as any,
       },
-      ...options,
+      order,
+      take: limit,
+      skip: offset,
     });
+
+    return {
+      count,
+      page,
+      size,
+      lastPage: Math.ceil(count / size),
+      data: entities,
+    };
   }
 
   async findOneAndDelete(where: FindOptionsWhere<T>) {

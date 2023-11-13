@@ -10,12 +10,12 @@ export class UserController {
 
   @Get()
   async listUsers(): TApiResponseAsync<User[]> {
-    const users = await this.userService.list();
+    // const users = await this.userService.list();
 
     return {
       statusCode: HttpStatus.OK,
       message: `User retrieved successfully`,
-      data: users,
+      data: [],
     };
   }
 }
