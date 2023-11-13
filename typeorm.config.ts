@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 config();
 
@@ -11,6 +12,7 @@ export default new DataSource({
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   synchronize: process.env.NODE_ENV === 'development' ? true : false,
-  entities: ['libs/common/src/entities/**/*.ts'],
-  migrations: ['migrations/**/*'],
+  namingStrategy: new SnakeNamingStrategy(),
+  entities: ['./dist/libs/common/src/entities/**/*.entity.js'],
+  migrations: ['./dist/migrations/**/*.js'],
 });

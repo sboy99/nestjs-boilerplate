@@ -12,7 +12,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'dist', 'node_modules'],
   rules: {
     'no-console': ['warn', { allow: ['error'] }],
     'simple-import-sort/imports': 'warn',

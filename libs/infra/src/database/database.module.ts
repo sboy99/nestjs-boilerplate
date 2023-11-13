@@ -18,8 +18,8 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         namingStrategy: new SnakeNamingStrategy(),
         autoLoadEntities: true,
         synchronize: configService.getOrThrow('NODE_ENV') === 'development' ? true : false,
-        entities: ['libs/common/src/entities/**/*.ts'],
-        migrations: ['migrations/**/*'],
+        entities: ['./dist/libs/common/src/entities/**/*.entity.js'],
+        migrations: ['./dist/migrations/**/*.js'],
         cli: {
           entitiesDir: 'libs/common/src/entities',
           migrationsDir: 'migrations',

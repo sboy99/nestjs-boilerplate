@@ -11,16 +11,16 @@ export class AbstractEntity<TEntity> {
   @Column({ default: false })
   isDeleted?: boolean;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ default: null })
-  deletedAt?: Date | null;
+  @Column({ default: null, nullable: true })
+  deletedAt?: Date;
 
-  constructor(entity: TEntity) {
+  constructor(entity: Partial<TEntity>) {
     Object.assign(this, entity);
   }
 }
