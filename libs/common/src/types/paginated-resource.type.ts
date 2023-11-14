@@ -3,5 +3,5 @@ export type TPaginatedResource<T> = {
   size: number;
   count: number;
   lastPage: number;
-  data: T[];
+  results: T[];
 };

@@ -5,14 +5,22 @@ import type { Request } from 'express';
 
 import type { TSortingQuery } from '../types';
 
+type TSortParams<T extends AbstractEntity<T>> = {
+  sortableFields: Array<keyof T>;
+};
+
 export const SortingQuery = createParamDecorator(
-  <T extends AbstractEntity<T>>(validParams: Array<keyof T>, ctx: ExecutionContext): TSortingQuery<T> => {
+  <T extends AbstractEntity<T>>(sortParams: TSortParams<T>, ctx: ExecutionContext): TSortingQuery<T> | undefined => {
     const req = ctx.switchToHttp().getRequest<Request>();
-    const sortString: string = req?.query?.sort ? req.query?.sort.toString() : 'createdAt:desc';
+    const sortString: string | undefined = req?.query?.sort && req.query?.sort.toString();
+
+    if (!sortString) return;
+
+    const sortableFields = sortParams.sortableFields;
 
     return sortString.split('&&').map((sort) => {
       // check if the valid params sent is an array
-      if (!Array.isArray(validParams)) throw new BadRequestException('Invalid sort parameter');
+      if (!Array.isArray(sortableFields)) throw new BadRequestException('Invalid sort parameter');
 
       // check the format of the sort query param
       const sortPattern = /^([a-zA-Z0-9]+):(asc|desc)$/;
@@ -20,7 +28,7 @@ export const SortingQuery = createParamDecorator(
 
       // extract the property name and direction and check if they are valid
       const [property, direction] = sort.split(':') as [keyof T, 'asc' | 'desc'];
-      if (!validParams.includes(property as keyof T))
+      if (!sortableFields.includes(property as keyof T))
         throw new BadRequestException(`Invalid sort property: ${property.toString()}`);
 
       return { property, direction };

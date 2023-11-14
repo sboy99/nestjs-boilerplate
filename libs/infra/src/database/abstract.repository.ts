@@ -46,7 +46,8 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   async list(query: TQuery<T>): Promise<TPaginatedResource<T>> {
     const where = getWhere(query?.filters);
     const order = getOrder(query?.sorts);
-
+    const select = query?.select;
+    const relations = query?.populate;
     const { limit, offset, page, size } = query.pagination;
 
     const [entities, count] = await this.entityRepository.findAndCount({
@@ -55,6 +56,8 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
         isDeleted: false as any,
       },
       order,
+      select,
+      relations,
       take: limit,
       skip: offset,
     });
@@ -64,7 +67,7 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
       page,
       size,
       lastPage: Math.ceil(count / size),
-      data: entities,
+      results: entities,
     };
   }
 

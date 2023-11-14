@@ -1,6 +1,14 @@
-import { FilteringQuery, PaginationQuery, SortingQuery } from '@app/common/decorators';
+import { FilteringQuery, PaginationQuery, PopulationQuery, SelectionQuery, SortingQuery } from '@app/common/decorators';
 import type { Task } from '@app/common/entities';
-import { TApiResponseAsync, TFilteringQuery, TPaginationQuery, TSortingQuery } from '@app/common/types';
+import type { TPaginatedResource } from '@app/common/types';
+import {
+  TApiResponseAsync,
+  TFilteringQuery,
+  TPaginationQuery,
+  TPopulationQuery,
+  TSelectionQuery,
+  TSortingQuery,
+} from '@app/common/types';
 import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 
 import { CreateTaskDto } from './dtos/create-task.dto';
@@ -23,15 +31,49 @@ export class TasksController {
 
   @HttpCode(HttpStatus.OK)
   @Get()
-  listTasks(
+  async listTasks(
     @PaginationQuery() pagination: TPaginationQuery,
-    @SortingQuery<Task>(['id', 'createdAt', 'updatedAt', 'taskName']) sorts: TSortingQuery<Task>,
-    @FilteringQuery<Task>(['id', 'createdAt', 'taskName', 'priority']) filters: TFilteringQuery<Task>
-  ) {
-    return this.tasksService.list({
+    @SortingQuery<Task>({ sortableFields: ['id', 'createdAt', 'updatedAt', 'taskName'] })
+    sorts: TSortingQuery<Task>,
+    @FilteringQuery<Task>({ filterableFields: ['id', 'createdAt', 'taskName', 'priority'] })
+    filters: TFilteringQuery<Task>,
+    @PopulationQuery<Task>({ populatableFields: ['createdBy'], defaultPopulate: ['createdBy'] })
+    populate: TPopulationQuery<Task>,
+    @SelectionQuery<Task>({
+      selectableFields: [
+        'id',
+        'priority',
+        'taskName',
+        'createdAt',
+        'updatedAt',
+        'createdBy.id',
+        'createdBy.email',
+        'createdBy.fullName',
+      ],
+      defaultSelected: [
+        'id',
+        'priority',
+        'taskName',
+        'createdAt',
+        'createdBy.id',
+        'createdBy.email',
+        'createdBy.fullName',
+      ],
+    })
+    select: TSelectionQuery<Task>
+  ): TApiResponseAsync<TPaginatedResource<Task>> {
+    const paginatedTasks = await this.tasksService.list({
       pagination,
       filters,
       sorts,
+      select,
+      populate,
     });
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: `Total ${paginatedTasks.count} results found`,
+      data: paginatedTasks,
+    };
   }
 }

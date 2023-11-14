@@ -1,4 +1,5 @@
 import type { AbstractEntity } from '@app/infra';
+import type { FindOptionsRelations, FindOptionsSelect } from 'typeorm';
 
 import type { FilterRule } from '../enums';
 
@@ -20,8 +21,13 @@ export type TSortingQuery<T extends AbstractEntity<T>> = Array<{
   direction: 'asc' | 'desc';
 }>;
 
+export type TSelectionQuery<T extends AbstractEntity<T>> = FindOptionsSelect<T>;
+export type TPopulationQuery<T extends AbstractEntity<T>> = FindOptionsRelations<T>;
+
 export type TQuery<T extends AbstractEntity<T>> = {
   pagination: TPaginationQuery;
+  select?: TSelectionQuery<T>;
+  populate?: TPopulationQuery<T>;
   sorts?: TSortingQuery<T>;
   filters?: TFilteringQuery<T>;
 };
