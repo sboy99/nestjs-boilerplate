@@ -1,3 +1,4 @@
+import type { TPaginatedResource, TQuery } from '@app/common/types';
 import type { Logger } from '@nestjs/common';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { isUUID } from 'class-validator';
@@ -34,9 +35,9 @@ export type TCreateUniqueDocumentParams<TDoc extends AbstractDocument<TDoc>> = {
 };
 
 export type TListDocumentsParams<TDoc extends AbstractDocument<TDoc>> = {
+  apiQuery: TQuery<TDoc>;
   filterQuery?: FilterQuery<TDoc>;
-  queryOptions?: QueryOptions<TDoc>;
-  projection?: ProjectionType<TDoc>;
+  queryOptions?: Omit<QueryOptions<TDoc>, 'skip' | 'limit' | 'sort'>;
 };
 
 export type TOptions = Partial<{
@@ -152,11 +153,39 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument<TDoc
   }
 
   public async list<TDoc extends TDocument>({
+    apiQuery,
     filterQuery,
-    projection,
     queryOptions,
-  }: TListDocumentsParams<TDoc>): Promise<TDoc[]> {
-    return this.model.find({ ...filterQuery, isDeleted: false }, projection, queryOptions).lean<TDoc[]>(true);
+  }: TListDocumentsParams<TDoc>): Promise<TPaginatedResource<TDoc>> {
+    // objectify sort order
+    const sortOrder = (apiQuery?.sort || []).reduce<Record<string, string>>((acc, curr) => {
+      acc[curr.property as string] = curr.direction;
+      return acc;
+    }, {});
+
+    // calculate document count
+    const documentsCount = await this.model.countDocuments({
+      ...filterQuery,
+      isDeleted: false,
+    });
+
+    // list documents
+    const documentsList = await this.model
+      .find({ ...filterQuery, isDeleted: false }, apiQuery?.select, {
+        ...queryOptions,
+        sort: sortOrder,
+        skip: apiQuery.pagination.offset,
+        limit: apiQuery.pagination.limit,
+      })
+      .lean<TDoc[]>(true);
+
+    return {
+      count: documentsCount,
+      page: apiQuery.pagination.page,
+      size: apiQuery.pagination.size,
+      lastPage: Math.ceil(documentsCount / apiQuery.pagination.size),
+      results: documentsList,
+    };
   }
 
   public async lookUp<TDoc extends TDocument>({

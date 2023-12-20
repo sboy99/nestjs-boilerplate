@@ -26,6 +26,6 @@ export type TSelectionQuery<T extends AbstractDocument<T>> = ProjectionType<T>;
 export type TQuery<T extends AbstractDocument<T>> = {
   pagination: TPaginationQuery;
   select?: TSelectionQuery<T>;
-  sorts?: TSortingQuery<T>;
-  filters?: TFilteringQuery<T>;
+  sort?: TSortingQuery<T>;
+  filter?: TFilteringQuery<T>;
 };
