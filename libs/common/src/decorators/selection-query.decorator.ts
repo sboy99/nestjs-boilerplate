@@ -1,4 +1,4 @@
-import type { AbstractDocument } from '@app/infra';
+import type { AbstractDocument } from '@app/infra/database';
 import type { ExecutionContext } from '@nestjs/common';
 import { BadRequestException, createParamDecorator } from '@nestjs/common';
 import type { Request } from 'express';

@@ -1,4 +1,4 @@
-import type { AbstractDocument } from '@app/infra';
+import type { AbstractDocument } from '@app/infra/database';
 import type { ProjectionType } from 'mongoose';
 
 import type { FilterRule } from '../enums';
