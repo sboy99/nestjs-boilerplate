@@ -1,4 +1,4 @@
-import type { AbstractDocument } from '@app/infra/database';
+import type { AbstractDocument } from '@app/common/abstracts';
 import type { ExecutionContext } from '@nestjs/common';
 import { BadRequestException, createParamDecorator } from '@nestjs/common';
 import type { Request } from 'express';
@@ -12,14 +12,20 @@ type TSelection<T extends AbstractDocument<T>> = {
 };
 
 export const SelectionQuery = createParamDecorator(
-  <T extends AbstractDocument<T>>(selection: TSelection<T>, ctx: ExecutionContext): TSelectionQuery<T> => {
+  <T extends AbstractDocument<T>>(
+    selection: TSelection<T>,
+    ctx: ExecutionContext
+  ): TSelectionQuery<T> => {
     const req = ctx.switchToHttp().getRequest<Request>();
     const selectableFields = selection.selectableFields;
     const defaultSelect = selection.defaultSelected.join(',');
-    const selectString: string = req.query?.select ? (req.query.select as string) : defaultSelect;
+    const selectString: string = req.query?.select
+      ? (req.query.select as string)
+      : defaultSelect;
 
     // check if the valid params sent is an array
-    if (!Array.isArray(selectableFields)) throw new BadRequestException('Invalid select parameter');
+    if (!Array.isArray(selectableFields))
+      throw new BadRequestException('Invalid select parameter');
 
     // validate the format of the select, if the rule is 'isnull' or 'isnotnull' it don't need to have a value
     // enable for not selecting if (!selectString.match(/^[a-zA-Z0-9_!,.]+$/)) {
@@ -36,7 +42,9 @@ export const SelectionQuery = createParamDecorator(
     if (selectString !== defaultSelect)
       selectedFields.forEach((field) => {
         if (!selectableFields.includes(field as keyof T & string))
-          throw new BadRequestException(`Invalid select property: ${field.toString()}`);
+          throw new BadRequestException(
+            `Invalid select property: ${field.toString()}`
+          );
       });
 
     return selectedFields.reduce<ProjectionType<T>>((acc, field) => {

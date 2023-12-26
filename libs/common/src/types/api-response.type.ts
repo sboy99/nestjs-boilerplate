@@ -17,11 +17,17 @@ export type TApiErrorResponse<T = unknown> = {
   error?: T;
 };
 
-export type TApiResponse<TData = unknown, TTokens = unknown, TError = unknown> = TApiBaseReponse &
+export type TApiResponse<
+  TData = unknown,
+  TTokens = unknown,
+  TError = unknown,
+> = TApiBaseReponse &
   TApiDataResponse<TData> &
   TApiTokenResponse<TTokens> &
   TApiErrorResponse<TError>;
 
-export type TApiResponseAsync<TData = unknown, TTokens = unknown, TError = unknown> = Promise<
-  TApiResponse<TData, TTokens, TError>
->;
+export type TApiResponseAsync<
+  TData = unknown,
+  TTokens = unknown,
+  TError = unknown,
+> = Promise<TApiResponse<TData, TTokens, TError>>;

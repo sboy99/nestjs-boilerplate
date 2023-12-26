@@ -1,21 +1,12 @@
-import { AbstractDocument } from '@app/infra/database';
+import { AbstractDocument } from '@app/common/abstracts';
 import type { ModelDefinition } from '@nestjs/mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { SchemaTypes } from 'mongoose';
 
 import { MAX_INPUT_SIZE, MIN_INPUT_SIZE } from '../constants';
+import { getDefaultSchemaOptions } from '../utils';
 
-@Schema({
-  versionKey: false,
-  timestamps: true,
-  validateBeforeSave: true,
-  toJSON: {
-    virtuals: true,
-  },
-  toObject: {
-    virtuals: true,
-  },
-})
+@Schema(getDefaultSchemaOptions())
 export class User extends AbstractDocument<User> {
   @Prop({
     type: SchemaTypes.String,

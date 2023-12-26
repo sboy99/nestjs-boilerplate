@@ -1,5 +1,8 @@
 import { Global, Module } from '@nestjs/common';
-import { ConfigModule as NestConfigModule, ConfigService } from '@nestjs/config';
+import {
+  ConfigModule as NestConfigModule,
+  ConfigService,
+} from '@nestjs/config';
 
 import { AppConfigSchema } from './schemas';
 
