@@ -1,6 +1,6 @@
+import { AbstractRepository } from '@app/common/abstracts';
 import { User } from '@app/common/models';
 import { getRandomNumber } from '@app/common/utils';
-import { AbstractRepository } from '@app/infra/database';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
