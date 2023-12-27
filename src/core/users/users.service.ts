@@ -9,7 +9,12 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   public async list(query: TQuery<User>) {
-    return this.usersRepository.list({
+    return this.usersRepository.listWithCache({
+      cacheOptions: {
+        key: query,
+        ttl: '5min',
+        scope: 'list',
+      },
       apiQuery: query,
     });
   }

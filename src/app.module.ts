@@ -1,3 +1,4 @@
+import { CacheModule } from '@app/infra/cache';
 import { ConfigModule } from '@app/infra/config';
 import { DatabaseModule } from '@app/infra/database';
 import { LoggerModule } from '@app/infra/logger';
@@ -8,7 +9,13 @@ import { AppService } from './app.service';
 import { UsersModule } from './core/users/users.module';
 
 @Module({
-  imports: [ConfigModule, DatabaseModule, LoggerModule, UsersModule],
+  imports: [
+    ConfigModule,
+    DatabaseModule,
+    CacheModule,
+    LoggerModule,
+    UsersModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
