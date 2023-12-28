@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { str } from './app.config';
+import { str } from '../constants';
 
 export const MongoConfigSchema = z.object({
   MONGO_URI: str,

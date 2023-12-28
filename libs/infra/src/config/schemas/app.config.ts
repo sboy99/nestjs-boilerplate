@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-export const str = z.string();
-export const port = z.coerce.number();
-export const num = z.coerce.number();
-
+import { port } from '../constants';
+import { ElkConfigSchema } from './elk.config';
 import { MongoConfigSchema } from './mongo.config';
 import { NodeConfigSchema } from './node.config';
 import { RedisConfigSchema } from './redis.config';
@@ -14,6 +12,7 @@ export const AppConfigSchema = z
   })
   .and(NodeConfigSchema)
   .and(MongoConfigSchema)
-  .and(RedisConfigSchema);
+  .and(RedisConfigSchema)
+  .and(ElkConfigSchema);
 
 export type TAppConfig = z.infer<typeof AppConfigSchema>;

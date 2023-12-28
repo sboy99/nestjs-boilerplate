@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { num, str } from './app.config';
+import { num, str } from '../constants';
 
 export const RedisConfigSchema = z.object({
   REDIS_URI: str,

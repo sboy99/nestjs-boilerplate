@@ -5,12 +5,25 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
   imports: [
     PinoLoggerModule.forRoot({
       pinoHttp: {
-        transport: {
-          target: 'pino-pretty',
-          options: {
-            singleLine: true,
+        serializers: {
+          req: (req) => ({
+            id: req.id,
+            method: req.method,
+            url: req.url,
+          }),
+        },
+        formatters: {
+          bindings: (bindings) => {
+            return {
+              pid: bindings.pid,
+            };
+          },
+          level: (label) => {
+            return { level: label.toUpperCase() };
           },
         },
+
+        timestamp: () => `,"timestamp":"${new Date(Date.now()).toISOString()}"`,
       },
     }),
   ],

@@ -11,7 +11,14 @@ import {
   TSelectionQuery,
   TSortingQuery,
 } from '@app/common/types';
-import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 
 import { UsersService } from './users.service';
 
@@ -51,6 +58,12 @@ export class UsersController {
       statusCode: HttpStatus.OK,
       data: usersList,
     };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('search/:text')
+  public async searchUsers(@Param('text') text: string) {
+    return this.usersService.search(text);
   }
 
   @HttpCode(HttpStatus.OK)
